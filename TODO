@@ -1,0 +1,28 @@
+* Return type polymorfism:
+
+  Instead of invoking a RemoteInterface method at the time the
+  interface is registered, invoke it when the method is invoked
+  with the provided types as arguments.  That will let the user
+  select what to return.
+
+
+* RemoteType should be a meta-class, just like RemoteInterface.
+
+  We could combine the type declaration with the type protocol.
+  Best would be if inheritance worked too.
+
+    class Object(RemoteType):
+        __remote_name__ = 'java.lang.Object'
+  
+    class MyObject(Object):
+        __remote_name__ = 'org.twisted.gwt.MyObject'
+	fieldName = RemoteAttribute(Integer(), "field")
+
+  Object and MyObject must implement IType.  
+
+  XXX: is this even possible with the current infrastructure?
+
+* Integrate with Trial so that client-side unit tests can be
+  written and be run against a Python servlet.
+
+* Tests for the RPC mechanism.

@@ -1,0 +1,107 @@
+= TwistedGWT =
+
+This is TwistedGWT, a small package for Twisted that allows you to
+write server-side RPC code to use with GWT RPC.
+
+
+== Introduction ==
+
+TwistedGWT is highly integrated with Twisted and Zope3 interfaces, and
+use functionality from both packages to let the developer focus on
+writing server-side code rather than to hack marshalling code.
+
+Features of TwistedGWT:
+
+ * Signature generation for types 
+ 
+ * Supports custom field serializers
+
+ * Supports generic field serialziers
+
+
+== Requirements ==
+
+ * GWT 1.5 RC1
+
+ * Twisted 8
+
+
+== Documentation ==
+
+There's none right now. See the small example below and try to figure
+out the details.
+
+
+== Sample ==
+
+Below is a small example of how TwistedGWT is used.  Note that the
+example has not been tested.  But it should give you a rough idea on
+how stuff is _expected_ to be used.
+
+{{{
+from xtwisted.gwt.interface import RemoteInterface
+from xtwisted.gwt import annotation, gwttypes
+from xtwisted.gwt.web import ServiceServlet
+from twisted.application import service, internet
+from twisted.web import server
+
+class ThingType(gwttypes.ObjectType):
+    __remote_name__ = 'test.Thing'
+
+    thingSchema = annotation.RemoteAttribute(
+        gwttypes.strType(),
+        "schema of the thing"
+        )
+
+class Thing:
+    # this tells TwistedGWT that Things conform to ThingType,
+    # and that a Thing can be constructed from a ThingType.
+    gwttypes.instanceClassOf(ThingType)
+
+    # need a zero-argument constructor:
+    def __init__(self):
+	self.thingSchema = "a thing"
+
+class IThingService(RemoteInterface):
+    # Server-side definition of the interface.
+
+    # Name of the interface that extends RemoteService
+    __remote_name__ = 'test.ThingService'
+
+    def doSomethingWithT(t1):
+	# this method returns something that conforms to
+	# ThingType definition done above.
+        return ThingType()
+
+    def doSomethingElse():
+	# this does not return anything
+        return gwttypes.void
+
+class ThingServiceImpl:
+    # Class that implements the remote interface.
+    # The resource will provide it.
+    implements(IThingService)
+
+    def doSomethingWithT(self, t1):
+	# simply return a new Thing
+	return Thing()
+
+    def doSomethingElse(self):
+	# do nothing except print that something was
+	# done
+	#
+	# we can return a deferred!
+	print "do something"
+
+class ThingServlet(ServiceServlet, ThingServiceImpl):
+    # this is the resource that you put somewhere in
+    # your resource tree, and point your remote interface
+    # against it.
+    pass
+
+application = service.Application("gwt backend app")
+site = server.Site(ThingServlet())
+httpservice = internet.TCPService(8080, site)
+httpservice.setServiceParent(application)
+}}}
+
