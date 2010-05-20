@@ -103,6 +103,7 @@ strType = annotation.String
 HashMapType = annotation.HashMap
 ArrayListType = annotation.ArrayList
 DateType = annotation.Date
+doubleType = annotation.Double
 
 
 # Singleton for void:

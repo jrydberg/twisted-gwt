@@ -111,6 +111,11 @@ class Boolean(_PrimitiveType):
     primitiveTypeName = 'Z'
 
 
+class Double(_PrimitiveType):
+    typeName = 'double'
+    primitiveTypeName = 'D'
+
+
 class Void(Type):
     
     def getTypeName(self):
@@ -184,7 +189,8 @@ def isPrimitiveType(typeInstance):
         isinstance(typeInstance, Integer) or
         isinstance(typeInstance, Long) or
         isinstance(typeInstance, Short) or
-        isinstance(typeInstance, Boolean)
+        isinstance(typeInstance, Boolean) or
+        isinstance(typeInstance, Double)
         )
 
 
@@ -597,6 +603,18 @@ class StringCustomFieldSerializer(_PrimitiveCustomFieldSerialzier):
         writer.writeString(value)
 
 registerCustomFieldSerializer(StringCustomFieldSerializer, String)
+
+
+class DoubleCustomFieldSerializer(_PrimitiveCustomFieldSerialzier):
+    className = 'java.lang.Double'
+    
+    def deserialize(self, reader):
+        return reader.readDouble()
+
+    def serialize(self, value, writer):
+        writer.writeDouble(value)
+
+registerCustomFieldSerializer(DoubleCustomFieldSerializer, Double)
 
 
 class AnnotationBuilder:

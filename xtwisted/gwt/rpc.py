@@ -295,7 +295,9 @@ class Request:
         """Return value.
         """
         if not isinstance(signature.returnTypeSignature, annotation.Void):
-            if signature.returnTypeSignature.isPrimitive():
+            if (signature.returnTypeSignature.isPrimitive() or
+                isinstance(signature.returnTypeSignature, 
+                           annotation.ArrayList)):
                 response.serializeValue(result, signature.returnTypeSignature)
             else:
                 response.writeObject(result)
