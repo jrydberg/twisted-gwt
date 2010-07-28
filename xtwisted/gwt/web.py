@@ -1,7 +1,7 @@
 # integration with twisted.web
 
-from twisted.web import resource, server
-from twisted.python import log
+from twisted.web import resource, server, iweb
+from twisted.python import log, context
 from xtwisted.gwt import rpc
 
 
@@ -19,6 +19,7 @@ class ServiceServlet(rpc._ServiceServlet, resource.Resource):
             request.setHeader("Content-length", len(content))
             request.write(content)
             request.finish()
-        self.processRequest(request.content.read()).addBoth(finish).addErrback(log.err)
+        procDeferred = context.call({iweb.IResource: request}, self.processRequest, request.content.read())
+        procDeferred.addBoth(finish).addErrback(log.err)
         return server.NOT_DONE_YET
 
